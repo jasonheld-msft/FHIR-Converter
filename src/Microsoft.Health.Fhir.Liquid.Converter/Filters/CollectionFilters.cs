@@ -91,15 +91,20 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
 
         public static object[] Select(object[] input, string path, string value = null)
         {
+            // Split path on . and []
             Queue<string> pathKeys = SplitObjectPath(path);
 
             List<object> ret = new List<object>();
 
             foreach (object obj in input)
             {
+                // Clone our queue so we can check this path on every object
+                // in this loop
                 var localPath = new Queue<string>(pathKeys);
                 if (ObjHasValueAtPath(obj, localPath, value))
                 {
+                    // This object has our value at the path so add it to our
+                    // return
                     ret.Add(obj);
                 }
             }
@@ -109,10 +114,14 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
 
         private static bool ObjHasValueAtPath(object input, Queue<string> path, string value)
         {
+            // Get our key name
             var key = path.Dequeue();
 
+            // Check if our key is an object property or an array reference
             if (key.Contains('['))
             {
+                // Our required path dictates we should have an array and if not
+                // this is not a match
                 if (!(input is Array))
                 {
                     return false;
@@ -120,6 +129,8 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
 
                 var inputArray = (object[])input;
 
+                // If key is [] then we want to loop over every object in the array
+                // and check for our future paths
                 if (key == "[]")
                 {
                     if (path.Count == 0)
@@ -130,6 +141,8 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
 
                     foreach (object obj in inputArray)
                     {
+                        // We need to clone our queue to prevent loop items from
+                        // overriding eachother
                         var localPath = new Queue<string>(path);
                         if (ObjHasValueAtPath(obj, localPath, value)) {
                             return true;
@@ -138,21 +151,27 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
 
                     return false;
                 }
-                else
+                else // If our array key references a specific index
                 {
+                    // Trim and parse out our numeric index
                     var indexStr = key.TrimStart('[').TrimEnd(']');
                     var index = int.Parse(indexStr);
 
+                    // If it's not possible that this array contains
+                    // the specified index then this is not a match
                     if (inputArray.Length < index)
                     {
                         return false;
                     }
                     else
                     {
+                        // If we have no future path
                         if (path.Count == 0)
                         {
+                            // And we have specified a value should exist here
                             if (value != null)
                             {
+                                // Check our value and return if does not match
                                 if (!(inputArray[index] is string) || (string)inputArray[index] != value)
                                 {
                                     return false;
@@ -160,29 +179,33 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
                             }
                         }
 
-                        return true;
+                        return true; // This array specified value is a match
                     }
                 }
             }
-            else
+            else // Our key is referencing an object property
             {
                 Dictionary<string, object> obj = (Dictionary<string, object>)input;
 
+                // If our object does not have the specified key, it is not a match
                 if (obj.ContainsKey(key))
                 {
+                    // If we're at the end of our path
                     if (path.Count == 0)
                     {
+                        // And we have a specified value
                         if (value != null)
                         {
+                            // Return false if we do not have a match
                             if (!(obj[key] is string) || (string)obj[key] != value)
                             {
                                 return false;
                             }
                         }
 
-                        return true;
+                        return true; // This object specified value is a match
                     }
-                    else
+                    else // We are not at the end of our path
                     {
                         return ObjHasValueAtPath(obj[key], path, value);
                     }
@@ -194,6 +217,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
             }
         }
 
+        // `test.path[].to[5].value` -> ['test', 'path', '[]', 'to', '[5]', 'value' ]
         private static Queue<string> SplitObjectPath(string path)
         {
             var delimeters = new[] { '.', '[', ']' };
@@ -230,8 +254,6 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
                 }
             }
 
-            parts.ToList<string>().ForEach(x => Console.WriteLine(x));
-
             return parts;
         }
 
@@ -254,7 +276,6 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
                 for (int k = 0; k < keys.Count() - 1; k++)
                 {
                     var cKey = keys[k];
-                    //Console.WriteLine(cKey);
                     if (res.ContainsKey(cKey))
                     {
                         res = (Dictionary<string, object>)res[cKey];
