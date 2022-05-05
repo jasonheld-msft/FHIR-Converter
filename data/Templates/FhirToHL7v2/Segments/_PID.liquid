@@ -18,6 +18,7 @@
 {%- endif -%}
 {%- if patient.identifier -%}
     {%- assign patientSB = patient.identifier | get_by_code: 'SB' -%}
+    {%- assign patientIDs = patient.identifier | select: 'type.coding[].code', "MR" -%}
 {%- endif -%}
 {%- if patient.maritalStatus -%}
     {%- assign patientMaritalCode = patient.maritalStatus.coding[0].code -%}

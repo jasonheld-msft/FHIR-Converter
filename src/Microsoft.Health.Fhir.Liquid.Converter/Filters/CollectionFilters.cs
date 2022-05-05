@@ -3,6 +3,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repo root for license information.
 // -------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -88,7 +89,151 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
             return null;
         }
 
-        //public static object FilterByKeyWithValue(object[] input, string key, string value)
+        public static object[] Select(object[] input, string path, string value = null)
+        {
+            Queue<string> pathKeys = SplitObjectPath(path);
+
+            List<object> ret = new List<object>();
+
+            foreach (object obj in input)
+            {
+                var localPath = new Queue<string>(pathKeys);
+                if (ObjHasValueAtPath(obj, localPath, value))
+                {
+                    ret.Add(obj);
+                }
+            }
+
+            return ret.ToArray<object>();
+        }
+
+        private static bool ObjHasValueAtPath(object input, Queue<string> path, string value)
+        {
+            var key = path.Dequeue();
+
+            if (key.Contains('['))
+            {
+                if (!(input is Array))
+                {
+                    return false;
+                }
+
+                var inputArray = (object[])input;
+
+                if (key == "[]")
+                {
+                    if (path.Count == 0)
+                    {
+                        // TODO: Can value matter when path ends in indiscriminite array?
+                        return true;
+                    }
+
+                    foreach (object obj in inputArray)
+                    {
+                        var localPath = new Queue<string>(path);
+                        if (ObjHasValueAtPath(obj, localPath, value)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+                else
+                {
+                    var indexStr = key.TrimStart('[').TrimEnd(']');
+                    var index = int.Parse(indexStr);
+
+                    if (inputArray.Length < index)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (path.Count == 0)
+                        {
+                            if (value != null)
+                            {
+                                if (!(inputArray[index] is string) || (string)inputArray[index] != value)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                Dictionary<string, object> obj = (Dictionary<string, object>)input;
+
+                if (obj.ContainsKey(key))
+                {
+                    if (path.Count == 0)
+                    {
+                        if (value != null)
+                        {
+                            if (!(obj[key] is string) || (string)obj[key] != value)
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        return ObjHasValueAtPath(obj[key], path, value);
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        private static Queue<string> SplitObjectPath(string path)
+        {
+            var delimeters = new[] { '.', '[', ']' };
+            var parts = new Queue<string>();
+            var current = new StringBuilder();
+            var bracket = false;
+
+            for (int i = 0; i < path.Length; i++)
+            {
+
+                if (delimeters.Contains(path[i]) == false)
+                {
+                    current.Append(path[i]);
+                }
+
+                if (path[i] == '[')
+                {
+                    parts.Enqueue(current.ToString());
+                    current.Length = 0;
+                    current.Append(path[i]);
+                    bracket = true;
+                }
+
+                if (path[i] == ']')
+                {
+                    current.Append(path[i]);
+                    bracket = false;
+                }
+
+                if ((path[i] == '.' && !bracket) || i == path.Length - 1)
+                {
+                    parts.Enqueue(current.ToString());
+                    current.Length = 0;
+                }
+            }
+
+            parts.ToList<string>().ForEach(x => Console.WriteLine(x));
+
+            return parts;
+        }
 
         public static object FilterByKeyWithValue(object[] input, string key, string needle)
         {
