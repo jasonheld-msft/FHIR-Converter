@@ -16,20 +16,18 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
 
         public static object[] Select(object[] input, string path, string value = null)
         {
-            // Split path on . and []
+            // Split path on . and [], [5]
             Queue<string> pathKeys = SplitObjectPath(path);
 
             List<object> ret = new List<object>();
 
             foreach (object obj in input)
             {
-                // Clone our queue so we can check this path on every object
-                // in this loop
+                // Clone the queue to scope the path at this level for each loop
                 var localPath = new Queue<string>(pathKeys);
                 if (ObjHasValueAtPath(obj, localPath, value))
                 {
-                    // This object has our value at the path so add it to our
-                    // return
+                    // This object has our value at the path so add it to our return
                     ret.Add(obj);
                 }
             }
@@ -39,9 +37,15 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
 
         public static bool ObjHasValueAtPath(object input, Queue<string> path, string value)
         {
+            // If we're at the end of the path then check the value
+            if (path.Count == 0)
+            {
+                // Return true if value is null and an equality check otherwise
+                return value == null || input.Equals(value);
+            }
+
             // Get our key name
             var key = path.Dequeue();
-            var endOfPath = path.Count == 0;
 
             // Check if our key is an object property or an array reference
             if (key.Contains('['))
@@ -59,7 +63,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
                 // and check for our future paths
                 if (key == "[]")
                 {
-                    if (endOfPath)
+                    if (path.Count == 0)
                     {
                         // TODO: Can value matter when path ends in indiscriminite array?
                         return true;
@@ -67,8 +71,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
 
                     foreach (object obj in inputArray)
                     {
-                        // We need to clone our queue to prevent loop items from
-                        // overriding eachother
+                        // Clone the queue to scope the path at this level for each loop
                         var localPath = new Queue<string>(path);
                         if (ObjHasValueAtPath(obj, localPath, value))
                         {
@@ -86,23 +89,16 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
                     var indexStr = key.TrimStart('[').TrimEnd(']');
                     var index = int.Parse(indexStr);
 
-                    // If it's not possible that this array contains the specified index
-                    // then this is not a match
-                    if (index < 0 || inputArray.Length < index)
+                    if (index >= 0 && inputArray.Length > index)
                     {
-                        return false;
+                        // Recurse
+                        return ObjHasValueAtPath(inputArray[index], path, value);
                     }
                     else
                     {
-                        // If we're at the end then check the value, otherwise recurse
-                        if (endOfPath)
-                        {
-                            return CheckValueTrueIfNull(inputArray[index], value);
-                        }
-                        else
-                        {
-                            return ObjHasValueAtPath(inputArray[index], path, value);
-                        }
+                        // It's not possible for this array to have the element specified
+                        // so this is not a match
+                        return false;
                     }
                 }
             }
@@ -112,18 +108,10 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             {
                 Dictionary<string, object> obj = (Dictionary<string, object>)input;
 
-                // If our object does not have the specified key, it is not a match
                 if (obj.ContainsKey(key))
                 {
-                    // If we're at the end then check the value, otherwise recurse
-                    if (endOfPath)
-                    {
-                        return CheckValueTrueIfNull(input, value);
-                    }
-                    else
-                    {
-                        return ObjHasValueAtPath(obj[key], path, value);
-                    }
+                    // Recurse
+                    return ObjHasValueAtPath(obj[key], path, value);
                 }
                 else
                 {
@@ -132,19 +120,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             }
         }
 
-        public static bool CheckValueTrueIfNull(object input, string value)
-        {
-            // Return true if value is null and an equality check otherwise
-            if (value == null)
-            {
-                return true;
-            }
-            else
-            {
-                return input.Equals(value);
-            }
-        }
-
+        // This function splits a string into an array of parts like
         // `test.path[].to[5].value` -> ['test', 'path', '[]', 'to', '[5]', 'value' ]
         public static Queue<string> SplitObjectPath(string path)
         {
@@ -162,9 +138,12 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
 
                 if (path[i] == '[')
                 {
-                    // Perform a split
-                    parts.Enqueue(part.ToString());
-                    part.Clear();
+                    if (part.Length > 0)
+                    {
+                        // Perform a split
+                        parts.Enqueue(part.ToString());
+                        part.Clear();
+                    }
 
                     // Brackets do not get stripped
                     part.Append(path[i]);
@@ -182,9 +161,9 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
                     bracket = false;
                 }
 
+                // Split on . if we're not in a bracket or if we're at the end of string
                 if ((path[i] == '.' && !bracket) || i == path.Length - 1)
                 {
-                    // Split on . if we're not in a bracket or if we're at the end of string
                     parts.Enqueue(part.ToString());
                     part.Clear();
                 }

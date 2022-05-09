@@ -193,17 +193,15 @@ namespace Microsoft.Health.Fhir.Liquid.Converter
                     // If we're at the end of our path
                     if (path.Count == 0)
                     {
-                        // And we have a specified value
-                        if (value != null)
+                        if (value == null)
                         {
-                            // Return false if we do not have a match
-                            if (!(obj[key] is string) || (string)obj[key] != value)
-                            {
-                                return false;
-                            }
+                            // A null value just checks for the existence of this path so return true
+                            return true;
                         }
-
-                        return true; // This object specified value is a match
+                        else
+                        {
+                            return obj[key].Equals(value);
+                        }
                     }
                     else // We are not at the end of our path
                     {
