@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
 {
@@ -52,54 +53,54 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             {
                 // Our required path dictates we should have an array and if not
                 // then this is not a match
-                if ((input is Array) == false)
+                if (input is JArray inputArray)
                 {
-                    return false;
-                }
-
-                var inputArray = (object[])input;
-
-                // If key is [] then we want to loop over every object in the array
-                // and check for our future paths
-                if (key == "[]")
-                {
-                    if (path.Count == 0)
+                    // If key is [] then we want to loop over every object in the array
+                    // and check for our future paths
+                    if (key == "[]")
                     {
-                        // TODO: Can value matter when path ends in indiscriminite array?
-                        return true;
-                    }
-
-                    foreach (object obj in inputArray)
-                    {
-                        // Clone the queue to scope the path at this level for each loop
-                        var localPath = new Queue<string>(path);
-                        if (ObjHasValueAtPath(obj, localPath, value))
+                        if (path.Count == 0)
                         {
+                            // TODO: Can value matter when path ends in indiscriminite array?
                             return true;
                         }
-                    }
 
-                    return false;
-                }
+                        foreach (object obj in inputArray)
+                        {
+                            // Clone the queue to scope the path at this level for each loop
+                            var localPath = new Queue<string>(path);
+                            if (ObjHasValueAtPath(obj, localPath, value))
+                            {
+                                return true;
+                            }
+                        }
 
-                // If our array key references a specific index
-                else
-                {
-                    // Trim and parse out our numeric index
-                    var indexStr = key.TrimStart('[').TrimEnd(']');
-                    var index = int.Parse(indexStr);
-
-                    if (index >= 0 && inputArray.Length > index)
-                    {
-                        // Recurse
-                        return ObjHasValueAtPath(inputArray[index], path, value);
-                    }
-                    else
-                    {
-                        // It's not possible for this array to have the element specified
-                        // so this is not a match
                         return false;
                     }
+
+                    // If our array key references a specific index
+                    else
+                    {
+                        // Trim and parse out our numeric index
+                        var indexStr = key.TrimStart('[').TrimEnd(']');
+                        var index = int.Parse(indexStr);
+
+                        if (index >= 0 && inputArray.Count() > index)
+                        {
+                            // Recurse
+                            return ObjHasValueAtPath(inputArray[index], path, value);
+                        }
+                        else
+                        {
+                            // It's not possible for this array to have the element specified
+                            // so this is not a match
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
 

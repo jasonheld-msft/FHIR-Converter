@@ -10,26 +10,12 @@ using Microsoft.Health.Fhir.Liquid.Converter.Utilities;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
+using TestCase = Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Models.ComplexObjectFilterUtilityTestCase;
+
 namespace Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Utilities
 {
     public class ComplexObjectFilterUtilityTests
     {
-        public struct TestCase
-        {
-            public object[] Input;
-            public string Path;
-            public string Value;
-            public object[] Expected;
-
-            public TestCase(object[] input, string path, string value, object[] expected)
-            {
-                Input = input;
-                Path = path;
-                Value = value;
-                Expected = expected;
-            }
-        }
-
         [Fact]
         public void GivenObjectAndPath_SelectCorrectObjectsFromArray()
         {
@@ -39,6 +25,11 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Utilities
             {
                 new TestCase(testData, "age", "27", new object[] { testData[0] }),
                 new TestCase(testData, "upgrades.vision.system", "http://infrared.org/other", new object[] { testData[6] }),
+                new TestCase(testData, "friends[0].name", "Holland Ochoa", new object[] { testData[3] }),
+                new TestCase(testData, "friends[0].name", "Holland Ochoa", new object[] { testData[3] }),
+                new TestCase(testData, "friends[].parents[].tags[2]", "ex", new object[] { testData[3] }),
+                new TestCase(testData, "friends[].parents[].tags[2]", "hex", new object[] { }),
+                new TestCase(testData, "upgrades.bonemarrow.system", "http://illuminated.party", testData),
             };
 
             foreach (TestCase testCase in tests)
