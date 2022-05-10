@@ -41,7 +41,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             if (path.Count == 0)
             {
                 // Return true if value is null and an equality check otherwise
-                return value == null || input.Equals(value);
+                return value == null || input.ToString().Equals(value);
             }
 
             // Get our key name
@@ -106,17 +106,16 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             // Our key is referencing an object property
             else
             {
-                Dictionary<string, object> obj = (Dictionary<string, object>)input;
+                if (input is JObject obj)
+                {
+                    if (obj.ContainsKey(key))
+                    {
+                        // Recurse
+                        return ObjHasValueAtPath(obj[key], path, value);
+                    }
+                }
 
-                if (obj.ContainsKey(key))
-                {
-                    // Recurse
-                    return ObjHasValueAtPath(obj[key], path, value);
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
         }
 

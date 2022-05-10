@@ -16,12 +16,12 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Utilities
     {
         public struct TestCase
         {
-            public object Input;
+            public object[] Input;
             public string Path;
             public string Value;
             public object[] Expected;
 
-            public TestCase(object input, string path, string value, object[] expected)
+            public TestCase(object[] input, string path, string value, object[] expected)
             {
                 Input = input;
                 Path = path;
@@ -34,20 +34,18 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Utilities
         public void GivenObjectAndPath_SelectCorrectObjectsFromArray()
         {
             var testContent = File.ReadAllText("./TestData/ComplexObject.json");
-            var testData = JToken.Parse(testContent).ToObject<object>();
+            var testData = JToken.Parse(testContent).ToObject<object[]>();
             var tests = new TestCase[]
             {
-                new TestCase((object[])testData, "upgrades.vision.system", "http://infrared.org", null),
-                new TestCase((object[])testData, "gender", "male", null),
+                new TestCase(testData, "age", "27", new object[] { testData[0] }),
+                new TestCase(testData, "upgrades.vision.system", "http://infrared.org/other", new object[] { testData[6] }),
             };
 
             foreach (TestCase testCase in tests)
             {
                 var expected = testCase.Expected;
                 var actualData = ComplexObjectFilterUtility.Select(testCase.Input, testCase.Path, testCase.Value);
-                Console.WriteLine(actualData.Length);
-                Console.WriteLine("?!?!?!?!?!");
-                //Assert.Equal(expected, actualData);
+                Assert.Equal(expected, actualData);
             }
         }
 
