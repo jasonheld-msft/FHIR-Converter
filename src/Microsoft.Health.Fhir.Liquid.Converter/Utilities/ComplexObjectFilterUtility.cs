@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
 {
@@ -53,7 +52,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             {
                 // Our required path dictates we should have an array and if not
                 // then this is not a match
-                if (input is JArray inputArray)
+                if (input is object[] inputArray)
                 {
                     // If key is [] then we want to loop over every object in the array
                     // and check for our future paths
@@ -107,7 +106,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
             // Our key is referencing an object property
             else
             {
-                if (input is JObject obj)
+                if (input is Dictionary<string, object> obj)
                 {
                     if (obj.ContainsKey(key))
                     {
@@ -121,7 +120,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.Utilities
         }
 
         // This function splits a string into an array of parts like
-        // `test.path[].to[5].value` -> ['test', 'path', '[]', 'to', '[5]', 'value' ]
+        // `test.path[].to[5].value` -> ['test', 'path', '[]', 'to', '[5]', 'value']
         public static Queue<string> SplitObjectPath(string path)
         {
             var parts = new Queue<string>();

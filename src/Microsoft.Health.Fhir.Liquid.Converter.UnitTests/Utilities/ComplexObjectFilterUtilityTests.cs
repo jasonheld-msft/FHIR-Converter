@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repo root for license information.
 // -------------------------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Health.Fhir.Liquid.Converter.Extensions;
 using Microsoft.Health.Fhir.Liquid.Converter.Utilities;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -20,7 +20,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Utilities
         public void GivenObjectAndPath_SelectCorrectObjectsFromArray()
         {
             var testContent = File.ReadAllText("./TestData/ComplexObject.json");
-            var testData = JToken.Parse(testContent).ToObject<object[]>();
+            var testData = (object[])JToken.Parse(testContent).ToObject();
             var tests = new TestCase[]
             {
                 new TestCase(testData, "age", "27", new object[] { testData[0] }),
@@ -52,6 +52,7 @@ namespace Microsoft.Health.Fhir.Liquid.Converter.UnitTests.Utilities
                 { "[].[5].test.path[5]",     new string[] { "[]", "[5]", "test", "path", "[5]" } },
                 { "[5]",                     new string[] { "[5]" } },
                 { "[]",                      new string[] { "[]" } },
+                { "[559]",                   new string[] { "[559]" } },
             };
 
             foreach (KeyValuePair<string, string[]> data in testData)
