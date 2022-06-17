@@ -1,5 +1,15 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
+trigger:
+- main
+- master
+- dotliquid
+- refs/heads/dotliquid
+pr:
+- dotliquid
+- main
+- templates/*
+
 variables:
   solution: '**/*.sln'
   unitTestProjects: "**/*UnitTests/*.csproj"
@@ -12,18 +22,10 @@ variables:
   buildnum: $[counter(format('{0}.{1}.{2}',variables['major'],variables['minor'], variables['patch']), 1)]
   version: $(major).$(minor).$(patch).$(buildnum)
 
-
-trigger:
-  branches:
-    include:
-      - main
-
-pool:
-  vmImage: ubuntu-latest
-
-
 stages:
 - stage: Build
+  pool:
+      vmImage: 'windows-latest'
   jobs:
   - job: Build
     steps:
