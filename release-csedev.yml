@@ -16,16 +16,16 @@ variables:
   publishProject: "**/*Tool/*.csproj"
   functionalTests: "**/*FunctionalTests/*.csproj"
   buildConfiguration: 'Release'
-  major: 5
-  minor: 0
-  patch: 1
+  major: 4
+  minor: 5
+  patch: 0
   buildnum: $[counter(format('{0}.{1}.{2}',variables['major'],variables['minor'], variables['patch']), 1)]
   version: $(major).$(minor).$(patch).$(buildnum)
 
 stages:
 - stage: Build
   pool:
-      vmImage: 'windows-latest'
+      vmImage: 'windows-2019'
   jobs:
   - job: Build
     steps:
