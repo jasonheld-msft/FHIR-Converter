@@ -1,0 +1,30 @@
+{% comment %}
+Example of input:
+tribalCitizenship = {
+    "url": "http://hl7.org/fhir/StructureDefinition/patient-citizenship",
+    "extension": [
+        {
+            "url": "code",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "code": "CA",
+                        "display": "Canada",
+                        "system": "urn:iso:std:iso:3166"
+                    }
+                ],
+                "text": "Canada"
+            }
+        }
+    ]
+}
+{% endcomment %}
+{
+    "code": "{{ tribalCitizenship.extension[0].coding[0].code }}",
+    "display": "{{ tribalCitizenship.extension[0].coding[0].display }}",
+    "name": "{{tribalCitizenship.extension[0].coding[0] | replace:"urn:iso:std:" | replace:":" | upcase }}_1",
+    "alternate": {
+        "id": "",
+        "text": "",
+    }
+}
