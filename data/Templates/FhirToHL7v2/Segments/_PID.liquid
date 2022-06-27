@@ -18,6 +18,9 @@
     {%- assign patientTaxonomy = patientAnimal.extension | select: 'url', 'species' | get_index: 0 -%}
     {%- evaluate patientTaxonomyCWEJson using 'Mutators/patientTaxonomyToCWE' taxonomy: patientTaxonomy -%}
     {%- assign patientTaxonomyCWE = patientTaxonomyCWEJson | from_json_string -%}
+    {%- assign patientBreed = patientAnimal.extension | select: 'url', 'breed' | get_index: 0 -%}
+    {%- evaluate patientBreedCWEJson using 'Mutators/PatientBreedToCWE' breed: patientBreed -%}
+    {%- assign patientBreedCWE = patientBreedCWEJson | from_json_string -%}
     {%- assign patientEthnicity = patient.extension | select: 'url', 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity' | get_index: 0 -%}
     {%- evaluate patientEthnicityCWEJson using 'Mutators/PatientEthnicityToCWE' ethnicity: patientEthnicity -%}
     {%- assign patientEthnicityCWE = patientEthnicityCWEJson | from_json_string -%}
@@ -112,7 +115,7 @@
 {% comment %} 33 Last Update Date/Time                 {% endcomment %}{% comment %}20050110015014+0315{% endcomment %}|
 {% comment %} 34 Last Update Facility                  {% endcomment %}|
 {% comment %} 35 Taxonomic Classification Code         {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTaxonomyCWE %}|
-{% comment %} 36 Breed Code                            {% endcomment %}{% comment %}4880003^Beagle^SCT{% endcomment %}|
+{% comment %} 36 Breed Code                            {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientBreedCWE %}|
 {% comment %} 37 Strain                                {% endcomment %}|
 {% comment %} 38 Production Class Code                 {% endcomment %}|
 {% comment %} 39 Tribal Citizenship                    {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTribalCitizenshipCWE %}|
