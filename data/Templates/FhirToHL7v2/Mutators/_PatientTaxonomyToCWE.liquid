@@ -1,0 +1,26 @@
+{% comment %}
+Example of input:
+taxonomy = {
+        "url": "species",
+        "valueCodeableConcept": {
+            "coding": [
+                {
+                    "code": "125097000",
+                    "display": "Goat",
+                    "system": "http://snomed.info/sct"
+                }
+            ],
+            "text": "Goat"
+        }
+    }
+{% endcomment %}
+{%- assign taxonomyCode = taxonomy.valueCodeableConcept.coding[0] -%}
+{
+    "code": "{{ taxonomyCode.code }}",
+    "display": "{{ taxonomyCode.display }}",
+    "name": "{{ taxonomyCode.system | replace: 'http://snomed.info/'  | upcase }}",
+    "alternate": {
+        "id": "",
+        "text": "",  
+    }
+}
