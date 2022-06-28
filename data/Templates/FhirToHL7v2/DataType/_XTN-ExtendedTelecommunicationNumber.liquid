@@ -1,15 +1,26 @@
 {% comment -%}
 Example of Input:
-{
-    "value": "2222",
-    "system": "phone",
-    "period": {
-        "start": "2001-01-10",
-        "end": "2002-01-10"
-    },
-    "rank": 18,
-    "use": "home"
+phoneNumber = {
+    "number": "",
+    "use": "",
+    "type": "",
+    "value": "",
+    "country": "",
+    "area": "",
+    "local": "",
+    "extension": "",
+    "text": "",
+    "prefix": "",
+    "speed": "",
+    "unformatted": "",
+    "effective": "",
+    "expiration": "",
+    "protection": "",
+    "shared": "",
+    "order": ""
 }
+or
+phoneNumbers = [phoneNumber, phoneNumber]
 {% endcomment -%}
 {%- if phoneNumber -%}
     {%- assign phoneNumbers = phoneNumber | to_array -%}
@@ -17,20 +28,26 @@ Example of Input:
 {% capture repeats -%}
 {%- for phoneNumber in phoneNumbers -%}
 {% capture XTN -%}
-{% comment %}  1 Telephone Number             {% endcomment %}{{ phoneNumber.value }}^
+{% comment %}  1 Telephone Number             {% endcomment %}^
 {% comment %}  2 Telecom Use Code             {% endcomment %}^
-{% comment %}  3 Telecom Equipment Type       {% endcomment %}^
-{% comment %}  4 Email Address                {% endcomment %}^
+{% comment %}  3 Telecom Equipment Type       {% endcomment %}{{ phoneNumber.type }}^
+{% comment %}  4 Communication Address        {% endcomment %}{{ phoneNumber.value }}^
 {% comment %}  5 Country Code                 {% endcomment %}^
 {% comment %}  6 Area/City Code               {% endcomment %}^
-{% comment %}  7 Local Number                 {% endcomment %}^
+{% comment %}  7 Local Number                 {% endcomment %}{{ phoneNumber.local }}^
 {% comment %}  8 Extension                    {% endcomment %}^
 {% comment %}  9 Any Text                     {% endcomment %}^
 {% comment %} 10 Extension Prefix             {% endcomment %}^
 {% comment %} 11 Speed Dial Code              {% endcomment %}^
-{% comment %} 12 Unformatted Telephone Number {% endcomment %}
+{% comment %} 12 Unformatted Telephone Number {% endcomment %}{{ phoneNumber.unformatted }}^
+{% comment %} 13 Effective Start Date         {% endcomment %}{{ phoneNumber.effective }}^
+{% comment %} 14 Expiration Date              {% endcomment %}{{ phoneNumber.expiration }}^
+{% comment %} 15 Expiration Reason            {% endcomment %}^
+{% comment %} 16 Protection Code              {% endcomment %}^
+{% comment %} 17 Shared Telecom Identifier    {% endcomment %}^
+{% comment %} 18 Preference Order             {% endcomment %}{{ phoneNumber.order }}
 {% endcapture -%}
-{{ XTN | strip_newlines }}
+{{ XTN | strip_newlines | remove_char_from_end: '^' }}
 ~
 {%- endfor -%}
 {% endcapture -%}

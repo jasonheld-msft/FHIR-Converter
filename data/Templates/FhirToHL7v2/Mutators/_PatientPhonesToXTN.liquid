@@ -1,0 +1,44 @@
+{% comment %}
+Example of input:
+phones = [
+    {
+        "value": "5555",
+        "use": "work",
+        "system": "email",
+        "period": {
+            "start": "2001-01-10",
+            "end": "2002-01-10"
+        },
+        "rank": 18
+    },
+    {
+        "value": "121111",
+        "use": "home",
+        "system": "phone"
+    }
+]
+{% endcomment %}
+{% capture repeats -%}
+{%- for phone in phones -%}
+    {
+        "number": "",
+        "use": "",
+        "type": "{{ CodeMapping.Mapping['CodeSystem/TelecomEquipmentType'][phone.system] }}",
+        "value": "{{ phone.value }}",
+        "country": "",
+        "area": "",
+        "local": "",
+        "extension": "",
+        "text": "",
+        "prefix": "",
+        "speed": "",
+        "unformatted": "",
+        "effective": "{{ phone.period.start | remove: '-' }}",
+        "expiration": "{{ phone.period.end | remove: '-' }}",
+        "protection": "",
+        "shared": "",
+        "order": "{{ phone.rank }}"
+    },
+{%- endfor -%}
+{% endcapture -%}
+[{{ repeats | strip_newlines | remove_char_from_end: ',' -}}]
