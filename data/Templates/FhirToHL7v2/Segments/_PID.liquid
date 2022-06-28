@@ -56,6 +56,9 @@
     {%- assign patientWorkPhones = patientPhones | select: 'use', 'work' -%}
     {%- evaluate patientWorkPhonesXTNJson using 'Mutators/PatientPhonesToXTN' phones: patientWorkPhones -%}
     {%- assign patientWorkPhonesXTN = patientWorkPhonesXTNJson | from_json_string -%}
+    {%- assign patientEmail = patient.telecom | select: 'system', 'email' | get_index: 0 -%}
+    {%- evaluate patientEmailXTNJson using 'Mutators/PatientEmailToXTN' email: patientEmail -%}
+    {%- assign patientEmailXTN = patientEmailXTNJson | from_json_string -%}
 {%- endif -%}
 {%- if patient.identifier -%}
     {%- assign patientSB = patient.identifier | get_by_code: 'SB' -%}
@@ -120,6 +123,6 @@
 {% comment %} 37 Strain                                {% endcomment %}|
 {% comment %} 38 Production Class Code                 {% endcomment %}|
 {% comment %} 39 Tribal Citizenship                    {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTribalCitizenshipCWE %}|
-{% comment %} 40 Patient Telecommunication Information {% endcomment %}{% comment %}89898989^WPN^Internet{% endcomment %}
+{% comment %} 40 Patient Telecommunication Information {% endcomment %}{% include 'DataType/XTN-ExtendedTelecommunicationNumber' phoneNumber: patientEmailXTN %}
 {% endcapture -%}
 {{ PID | strip_newlines | regex_replace: '\|(\|+)$', '' }}

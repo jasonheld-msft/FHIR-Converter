@@ -81,6 +81,11 @@
             "phone": "CP",
             "pager": "BP",
             "email": "INTERNET"
+        },
+        "CodeSystem/TelecomUseCode": {
+            "home": "PRN",
+            "work": "WPN",
+            "mobile": "PRS"
         }
     }
 }

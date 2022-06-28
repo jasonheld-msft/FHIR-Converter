@@ -28,8 +28,8 @@ phoneNumbers = [phoneNumber, phoneNumber]
 {% capture repeats -%}
 {%- for phoneNumber in phoneNumbers -%}
 {% capture XTN -%}
-{% comment %}  1 Telephone Number             {% endcomment %}^
-{% comment %}  2 Telecom Use Code             {% endcomment %}^
+{% comment %}  1 Telephone Number             {% endcomment %}{{ phoneNumber.number }}^
+{% comment %}  2 Telecom Use Code             {% endcomment %}{{ phoneNumber.use }}^
 {% comment %}  3 Telecom Equipment Type       {% endcomment %}{{ phoneNumber.type }}^
 {% comment %}  4 Communication Address        {% endcomment %}{{ phoneNumber.value }}^
 {% comment %}  5 Country Code                 {% endcomment %}^
