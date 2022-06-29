@@ -6,9 +6,10 @@
 {%- if patient.identifier and patient.identifier.size > 1 -%}
     {%- assign patientMRalt = patient.identifier[1] -%}
 {%- endif -%}
+{%- assign messageHeaderObject = fhirData.entry | select: 'resource.resourceType', 'MessageHeader' | get_index: 0 -%}
 {%- comment %} patient: {{ patient.id }} {% endcomment -%}
 {%- comment %} extension: {{ patient.extension }} {% endcomment -%}
-{%- comment %} Message Header          {% endcomment -%}{%- include 'Segments/MSH' messageTime: fhirData.timestamp, messageID: fhirData.identifier.value %}
+{%- comment %} Message Header          {% endcomment -%}{%- include 'Segments/MSH' messageTime: fhirData.timestamp, messageID: fhirData.identifier.value, messageHeader: messageHeaderObject %}
 {%- comment %} Software Segment        {% endcomment -%}{%- comment %}SFT|Orion|2.4.3.52854|Rhapsody|2.4.3|Testactivity|20070725111624{% endcomment -%}
 {%- comment %} Event Type              {% endcomment -%}{%- include 'Segments/EVN' recordedTime: fhirData.timestamp %}
 {%- comment %} Patient Identification  {% endcomment -%}{%- include 'Segments/PID' patient: patient, patientMR: patient.identifier[0], patientMRalt: patientMRalt, patientOrganizations: patientOrganizations, patientRelatedPersons: patientRelatedPersons %}
