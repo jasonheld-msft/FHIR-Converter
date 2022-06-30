@@ -122,7 +122,7 @@
 {% comment %} 22 Ethnic Group                          {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientEthnicityCWE %}|
 {% comment %} 23 Birth Place                           {% endcomment %}{{ patientBirthPlace.valueAddress.text }}|
 {% comment %} 24 Multiple Birth Indicator              {% endcomment %}{{ patientMultipleBirth }}|
-{% comment %} 25 Birth Order                           {% endcomment %}{% comment %}2{% endcomment %}|
+{% comment %} 25 Birth Order                           {% endcomment %}{{ patient.multipleBirthInteger }}|
 {% comment %} 26 Citizenship                           {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientCitizenshipCWE, codingSystem: 'HL70171' %}|
 {% comment %} 27 Verterans Military Status             {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientVeteranStatusCWE %}|
 {% comment %} 28 Nationality                           {% endcomment %}{% comment %}BT^Bhutan^ISO3166_1{% endcomment %}|
