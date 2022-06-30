@@ -86,6 +86,11 @@
             "home": "PRN",
             "work": "WPN",
             "mobile": "PRS"
-        }
+        },
+        "CodeSystem/Yes_No": [
+            "Y",
+            "N",
+            "N"
+        ]
     }
 }

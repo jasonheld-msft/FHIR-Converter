@@ -10,6 +10,7 @@
         {%- assign maidenNames = maidenInfo.valueString | split: '--' -%}
     {%- endif -%}
     {%- assign patientBirthPlace = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-birthPlace' | get_index: 0 -%}
+    {%- assign patientMultipleBirth = CodeMapping.Mapping['CodeSystem/Yes_No'][patient.multipleBirthInteger] -%}
     {%- comment -%} Religion {%- endcomment -%}
     {%- assign patientReligion = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-religion' | get_index: 0 -%}
     {%- evaluate patientReligionCWEJson using 'Mutators/PatientReligionToCWE' religion: patientReligion -%}
@@ -117,7 +118,7 @@
 {% comment %} 21 Mother's Identifier                   {% endcomment %}{% include 'DataType/CX-ExtendedID' id: patientMotherCX %}|
 {% comment %} 22 Ethnic Group                          {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientEthnicityCWE %}|
 {% comment %} 23 Birth Place                           {% endcomment %}{{ patientBirthPlace.valueAddress.text }}|
-{% comment %} 24 Multiple Birth Indicator              {% endcomment %}{% comment %}N{% endcomment %}|
+{% comment %} 24 Multiple Birth Indicator              {% endcomment %}{{ patientMultipleBirth }}|
 {% comment %} 25 Birth Order                           {% endcomment %}{% comment %}2{% endcomment %}|
 {% comment %} 26 Citizenship                           {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientCitizenshipCWE, codingSystem: 'HL70171' %}|
 {% comment %} 27 Verterans Military Status             {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientVeteranStatusCWE %}|
