@@ -134,7 +134,7 @@
 {% comment %} 30 Patient Death Indicator               {% endcomment %}{% comment %}Y{% endcomment %}{{ patientDeceased }}|
 {% comment %} 31 Identity Unknown Indicator            {% endcomment %}|
 {% comment %} 32 Identity Reliability Code             {% endcomment %}|
-{% comment %} 33 Last Update Date/Time                 {% endcomment %}{% comment %}20050110015014+0315{% endcomment %}|
+{% comment %} 33 Last Update Date/Time                 {% endcomment %}{% comment %}20050110015014+0315{% endcomment %}{{ patient.meta.lastUpdated | date_time_format: "yyyyMMddhhmmss" }}|
 {% comment %} 34 Last Update Facility                  {% endcomment %}|
 {% comment %} 35 Taxonomic Classification Code         {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTaxonomyCWE %}|
 {% comment %} 36 Breed Code                            {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientBreedCWE %}|
