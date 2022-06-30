@@ -9,27 +9,36 @@
     {%- if maidenInfo -%}
         {%- assign maidenNames = maidenInfo.valueString | split: '--' -%}
     {%- endif -%}
+    {%- comment -%} Religion {%- endcomment -%}
     {%- assign patientReligion = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-religion' | get_index: 0 -%}
     {%- evaluate patientReligionCWEJson using 'Mutators/PatientReligionToCWE' religion: patientReligion -%}
     {%- assign patientReligionCWE = patientReligionCWEJson | from_json_string -%}
     {%- assign patientReligions = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-religion' | get_index: 0 -%}
     {%- assign religionCodes = patientReligions.valueCodeableConcept.coding -%}
+    {%- comment -%} Animal {%- endcomment -%}
     {%- assign patientAnimal = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-animal' | get_index: 0 -%}
-    {%- evaluate patientAnimalCWEJson using 'Mutators/PatientAnimalToCWE' animal: patientAnimal -%}
-    {%- assign patientAnimalCWE = patientAnimalCWEJson | from_json_string -%}
+    {%- assign patientTaxonomy = patientAnimal.extension | select: 'url', 'species' | get_index: 0 -%}
+    {%- evaluate patientTaxonomyCWEJson using 'Mutators/patientTaxonomyToCWE' taxonomy: patientTaxonomy -%}
+    {%- assign patientTaxonomyCWE = patientTaxonomyCWEJson | from_json_string -%}
+    {%- assign patientBreed = patientAnimal.extension | select: 'url', 'breed' | get_index: 0 -%}
+    {%- evaluate patientBreedCWEJson using 'Mutators/PatientBreedToCWE' breed: patientBreed -%}
+    {%- assign patientBreedCWE = patientBreedCWEJson | from_json_string -%}
+    {%- comment -%} Ethnicity {%- endcomment -%}
     {%- assign patientEthnicity = patient.extension | select: 'url', 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity' | get_index: 0 -%}
     {%- evaluate patientEthnicityCWEJson using 'Mutators/PatientEthnicityToCWE' ethnicity: patientEthnicity -%}
     {%- assign patientEthnicityCWE = patientEthnicityCWEJson | from_json_string -%}
+    {%- comment -%} Citizenships {%- endcomment -%}
     {%- assign patientCitizenships = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-citizenship' -%}
     {%- assign patientFirstCitizenship = patientCitizenships | get_index: 0 -%}
     {%- evaluate patientCitizenshipCWEJson using 'Mutators/PatientCitizenshipToCWE' citizenship: patientFirstCitizenship -%}
     {%- assign patientCitizenshipCWE = patientCitizenshipCWEJson | from_json_string -%}
-    {%- assign patientVeteranStatus = patient.extension | select: 'url', 'http://example.com/v2-to-fhir-converter/StructureDefinition/VeteranMilitaryStatus' | get_index: 0 -%}
-    {%- evaluate patientVeteranStatusCWEJson using 'Mutators/patientVeteranMilitaryStatusToCWE' veteranStatus: patientVeteranStatus -%}
-    {%- assign patientVeteranStatusCWE = patientVeteranStatusCWEJson | from_json_string -%}
     {%- assign patientTribalCitizenship = patientCitizenships | get_index: 1 -%}
     {%- evaluate patientTribalCitizenshipCWEJson using 'Mutators/PatientCitizenshipToCWE' citizenship: patientTribalCitizenship -%}
     {%- assign patientTribalCitizenshipCWE = patientTribalCitizenshipCWEJson | from_json_string -%}
+    {%- comment -%} Veteran Status {%- endcomment -%}
+    {%- assign patientVeteranStatus = patient.extension | select: 'url', 'http://example.com/v2-to-fhir-converter/StructureDefinition/VeteranMilitaryStatus' | get_index: 0 -%}
+    {%- evaluate patientVeteranStatusCWEJson using 'Mutators/patientVeteranMilitaryStatusToCWE' veteranStatus: patientVeteranStatus -%}
+    {%- assign patientVeteranStatusCWE = patientVeteranStatusCWEJson | from_json_string -%}
 {%- endif -%}
 {%- if patient._birthDate -%}
 {%- assign birthInfo = patient._birthDate.extension | get_by_url: 'http://hl7.org/fhir/StructureDefinition/patient-birthTime' -%}
@@ -118,8 +127,8 @@
 {% comment %} 32 Identity Reliability Code             {% endcomment %}|
 {% comment %} 33 Last Update Date/Time                 {% endcomment %}{% comment %}20050110015014+0315{% endcomment %}|
 {% comment %} 34 Last Update Facility                  {% endcomment %}|
-{% comment %} 35 Taxonomic Classification Code         {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientAnimalCWE %}|
-{% comment %} 36 Breed Code                            {% endcomment %}{% comment %}4880003^Beagle^SCT{% endcomment %}|
+{% comment %} 35 Taxonomic Classification Code         {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTaxonomyCWE %}|
+{% comment %} 36 Breed Code                            {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientBreedCWE %}|
 {% comment %} 37 Strain                                {% endcomment %}|
 {% comment %} 38 Production Class Code                 {% endcomment %}|
 {% comment %} 39 Tribal Citizenship                    {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTribalCitizenshipCWE %}|
