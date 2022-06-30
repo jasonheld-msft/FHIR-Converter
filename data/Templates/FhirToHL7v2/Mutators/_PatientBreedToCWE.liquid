@@ -1,0 +1,26 @@
+{% comment %}
+Example of input:
+breed = {
+        "url": "breed",
+        "valueCodeableConcept": {
+            "coding": [
+                {
+                    "code": "4880003",
+                    "display": "Beagle",
+                    "system": "http://snomed.info/sct"
+                }
+            ],
+            "text": "Beagle"
+        }
+    }
+{% endcomment %}
+{%- assign breedCode = breed.valueCodeableConcept.coding[0] -%}
+{
+    "code": "{{ breedCode.code }}",
+    "display": "{{ breedCode.display }}",
+    "name": "{{ breedCode.system | replace: 'http://snomed.info/'  | upcase }}",
+    "alternate": {
+        "id": "",
+        "text": "",  
+    }
+}
