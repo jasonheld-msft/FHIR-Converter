@@ -9,6 +9,7 @@
     {%- if maidenInfo -%}
         {%- assign maidenNames = maidenInfo.valueString | split: '--' -%}
     {%- endif -%}
+    {%- assign patientBirthPlace = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-birthPlace' | get_index: 0 -%}
     {%- comment -%} Religion {%- endcomment -%}
     {%- assign patientReligion = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-religion' | get_index: 0 -%}
     {%- evaluate patientReligionCWEJson using 'Mutators/PatientReligionToCWE' religion: patientReligion -%}
@@ -115,7 +116,7 @@
 {% comment %} 20 Drivers License Number                {% endcomment %}{% comment %}DLN-123^US^20010123{% endcomment %}|
 {% comment %} 21 Mother's Identifier                   {% endcomment %}{% include 'DataType/CX-ExtendedID' id: patientMotherCX %}|
 {% comment %} 22 Ethnic Group                          {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientEthnicityCWE %}|
-{% comment %} 23 Birth Place                           {% endcomment %}{% comment %}St. Francis Community Hospital of Lower South Side{% endcomment %}|
+{% comment %} 23 Birth Place                           {% endcomment %}{{ patientBirthPlace.valueAddress.text }}|
 {% comment %} 24 Multiple Birth Indicator              {% endcomment %}{% comment %}N{% endcomment %}|
 {% comment %} 25 Birth Order                           {% endcomment %}{% comment %}2{% endcomment %}|
 {% comment %} 26 Citizenship                           {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientCitizenshipCWE, codingSystem: 'HL70171' %}|
