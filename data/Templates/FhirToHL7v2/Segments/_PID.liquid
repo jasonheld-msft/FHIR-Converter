@@ -126,7 +126,7 @@
 {% comment %} 26 Citizenship                           {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientCitizenshipCWE, codingSystem: 'HL70171' %}|
 {% comment %} 27 Verterans Military Status             {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientVeteranStatusCWE %}|
 {% comment %} 28 Nationality                           {% endcomment %}{% comment %}BT^Bhutan^ISO3166_1{% endcomment %}|
-{% comment %} 29 Patient Death Date And Time           {% endcomment %}{% comment %}20080825111630+0115{% endcomment %}|
+{% comment %} 29 Patient Death Date And Time           {% endcomment %}{{ patient.deceasedDateTime | date_time_format: "yyyyMMddhhmmss" }}|
 {% comment %} 30 Patient Death Indicator               {% endcomment %}{% comment %}Y{% endcomment %}|
 {% comment %} 31 Identity Unknown Indicator            {% endcomment %}|
 {% comment %} 32 Identity Reliability Code             {% endcomment %}|
