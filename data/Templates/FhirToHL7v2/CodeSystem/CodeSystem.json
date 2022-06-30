@@ -74,6 +74,18 @@
         "CodeSystem/Ethnicity": {
             "2135-2": "H",
             "2186-5": "N"
+        },
+        "CodeSystem/TelecomEquipmentType": {
+            "fax": "FX",
+            "other": "MD", 
+            "phone": "CP",
+            "pager": "BP",
+            "email": "INTERNET"
+        },
+        "CodeSystem/TelecomUseCode": {
+            "home": "PRN",
+            "work": "WPN",
+            "mobile": "PRS"
         }
     }
 }

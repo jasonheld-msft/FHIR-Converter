@@ -17,8 +17,6 @@
     {%- assign religionCodes = patientReligions.valueCodeableConcept.coding -%}
     {%- comment -%} Animal {%- endcomment -%}
     {%- assign patientAnimal = patient.extension | select: 'url', 'http://hl7.org/fhir/StructureDefinition/patient-animal' | get_index: 0 -%}
-    {%- evaluate patientAnimalCWEJson using 'Mutators/PatientAnimalToCWE' animal: patientAnimal -%}
-    {%- assign patientAnimalCWE = patientAnimalCWEJson | from_json_string -%}
     {%- assign patientTaxonomy = patientAnimal.extension | select: 'url', 'species' | get_index: 0 -%}
     {%- evaluate patientTaxonomyCWEJson using 'Mutators/patientTaxonomyToCWE' taxonomy: patientTaxonomy -%}
     {%- assign patientTaxonomyCWE = patientTaxonomyCWEJson | from_json_string -%}
@@ -60,8 +58,16 @@
 {%- assign patientMotherCX = patientMotherCXJson | from_json_string -%}
 {%- assign patientAddress = patient.address | slice_array: 0 -%}
 {%- if patient.telecom -%}
-    {%- assign patientHomePhones = patient.telecom | where: 'use', 'home' -%}
-    {%- assign patientWorkPhones = patient.telecom | where: 'use', 'work' -%}
+    {%- assign patientPhones = patient.telecom | select: 'system', 'phone' -%}
+    {%- assign patientHomePhones = patientPhones | select: 'use', 'home' -%}
+    {%- evaluate patientHomePhonesXTNJson using 'Mutators/PatientPhonesToXTN' phones: patientHomePhones -%}
+    {%- assign patientHomePhonesXTN = patientHomePhonesXTNJson | from_json_string -%}
+    {%- assign patientWorkPhones = patientPhones | select: 'use', 'work' -%}
+    {%- evaluate patientWorkPhonesXTNJson using 'Mutators/PatientPhonesToXTN' phones: patientWorkPhones -%}
+    {%- assign patientWorkPhonesXTN = patientWorkPhonesXTNJson | from_json_string -%}
+    {%- assign patientEmail = patient.telecom | select: 'system', 'email' | get_index: 0 -%}
+    {%- evaluate patientEmailXTNJson using 'Mutators/PatientEmailToXTN' email: patientEmail -%}
+    {%- assign patientEmailXTN = patientEmailXTNJson | from_json_string -%}
 {%- endif -%}
 {%- if patient.identifier -%}
     {%- assign patientSB = patient.identifier | get_by_code: 'SB' -%}
@@ -99,8 +105,8 @@
 {% comment %} 10 Race                                  {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' codes: patientRaceCWE %}|
 {% comment %} 11 Patient Address                       {% endcomment %}{% include 'DataType/XAD-ExtendedAddress' addresses: patientAddress %}|
 {% comment %} 12 Country Code                          {% endcomment %}{% comment %}GL{% endcomment %}|
-{% comment %} 13 Phone Number (Home)                   {% endcomment %}{% include 'DataType/XTN-ExtendedTelecommunicationNumber' phoneNumbers: patientHomePhones %}|
-{% comment %} 14 Phone Number (Business)               {% endcomment %}{% include 'DataType/XTN-ExtendedTelecommunicationNumber' phoneNumbers: patientWorkPhones %}|
+{% comment %} 13 Phone Number (Home)                   {% endcomment %}{% include 'DataType/XTN-ExtendedTelecommunicationNumber' phoneNumbers: patientHomePhonesXTN %}|
+{% comment %} 14 Phone Number (Business)               {% endcomment %}{% include 'DataType/XTN-ExtendedTelecommunicationNumber' phoneNumbers: patientWorkPhonesXTN %}|
 {% comment %} 15 Primary Language                      {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' codes: patientLanguagesCWE %}|
 {% comment %} 16 Marital Status                        {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' codes: patientMaritalStatus %}|
 {% comment %} 17 Religion                              {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientReligionCWE %}|
@@ -126,6 +132,6 @@
 {% comment %} 37 Strain                                {% endcomment %}|
 {% comment %} 38 Production Class Code                 {% endcomment %}|
 {% comment %} 39 Tribal Citizenship                    {% endcomment %}{% include 'DataType/CWE-CodedWithExceptions' code: patientTribalCitizenshipCWE %}|
-{% comment %} 40 Patient Telecommunication Information {% endcomment %}{% comment %}89898989^WPN^Internet{% endcomment %}
+{% comment %} 40 Patient Telecommunication Information {% endcomment %}{% include 'DataType/XTN-ExtendedTelecommunicationNumber' phoneNumber: patientEmailXTN %}
 {% endcapture -%}
 {{ PID | strip_newlines | regex_replace: '\|(\|+)$', '' }}

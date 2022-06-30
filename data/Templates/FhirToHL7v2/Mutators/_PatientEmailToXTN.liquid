@@ -1,0 +1,27 @@
+{% comment %}
+Example of input:
+email = {
+    "value": "89898989",
+    "use": "work",
+    "system": "email"
+}
+{% endcomment %}
+{
+    "number": "{{ email.value }}",
+    "use": "{{ CodeMapping.Mapping['CodeSystem/TelecomUseCode'][email.use] }}",
+    "type": "{{ CodeMapping.Mapping['CodeSystem/TelecomEquipmentType'][email.system] }}",
+    "value": "",
+    "country": "",
+    "area": "",
+    "local": "",
+    "extension": "",
+    "text": "",
+    "prefix": "",
+    "speed": "",
+    "unformatted": "",
+    "effective": "{{ email.period.start | remove: '-' }}",
+    "expiration": "{{ email.period.end | remove: '-' }}",
+    "protection": "",
+    "shared": "",
+    "order": "{{ email.rank }}"
+}
