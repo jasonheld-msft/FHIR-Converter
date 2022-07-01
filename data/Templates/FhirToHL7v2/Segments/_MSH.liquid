@@ -11,7 +11,7 @@
 {% comment %} 6 Receiving Facility                       {% endcomment %}{% comment %}GHHRFacility^2.16.840.1.1122848.1.32^ISO{% endcomment %}|
 {% comment %} 7 Date/Time of Message                     {% endcomment %}{{ messageTime | date_time_format: "yyyyMMddhhmmss" }}|
 {% comment %} 8 Security                                 {% endcomment %}{% comment %}SECURITY{% endcomment %}|
-{% comment %} 9 Message Type                             {% endcomment %}{% comment %}ADT^A08^ADT_A08{% endcomment %}|
+{% comment %} 9 Message Type                             {% endcomment %}{%- include 'DataType/MSG-MessageType' code: messageCode, event: triggerEvent, structure: messageStructure %}|
 {% comment %} 10 Message Control ID                      {% endcomment %}{{ messageID }}|
 {% comment %} 11 Processing ID                           {% endcomment %}{%- include 'DataType/PT-ProcessingType' id: 'P' %}|
 {% comment %} 12 Version ID                              {% endcomment %}{%- include 'DataType/VID-VersionIdentifier' id: '2.8' %}|

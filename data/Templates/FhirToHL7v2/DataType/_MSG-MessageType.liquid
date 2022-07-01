@@ -1,0 +1,6 @@
+{% capture MSG %}
+{% comment %} 1 Message Code {% endcomment %}{% if code %}{{ code }}{% endif %}^
+{% comment %} 2 Trigger Event {% endcomment %}{% if event %}{{ event }}{% endif %}^
+{% comment %} 3 Message Structure {% endcomment %}{% if structure %}{{ structure }}{% endif %}^
+{% endcapture %}
+{{ MSG | strip_newlines | remove_char_from_end: '^' }}

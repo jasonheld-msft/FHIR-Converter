@@ -1,5 +1,9 @@
 {% comment %} {{ '' | debug }} {% endcomment %}
 {%- assign messageHeaderObject = fhirData.entry | select: 'resource.resourceType', 'MessageHeader' | get_index: 0 -%}
+{% comment %} Since this is the ADT_08 liquid template, the following 3 can be hardcoded {% endcomment %}
+{%- assign messageCodeMSH = 'ADT' -%}
+{%- assign triggerEventMSH = 'A08' -%}
+{%- assign messageStructureMSH = 'ADT_A08' -%}
 {%- assign patient = fhirData.entry | get_resource: 'Patient' -%}
 {%- assign patientAccount = fhirData.entry | get_resource: 'Account' -%}
 {%- assign patientOrganizations = fhirData.entry | select: 'resource.resourceType', 'Organization' -%}
@@ -9,7 +13,7 @@
 {%- endif -%}
 {%- comment %} patient: {{ patient.id }} {% endcomment -%}
 {%- comment %} extension: {{ patient.extension }} {% endcomment -%}
-{%- comment %} Message Header          {% endcomment -%}{%- include 'Segments/MSH' messageTime: fhirData.timestamp, messageID: fhirData.identifier.value, messageHeader: messageHeaderObject %}
+{%- comment %} Message Header          {% endcomment -%}{%- include 'Segments/MSH' messageTime: fhirData.timestamp, messageID: fhirData.identifier.value, messageHeader: messageHeaderObject, messageCode: messageCodeMSH, triggerEvent: triggerEventMSH, messageStructure: messageStructureMSH %}
 {%- comment %} Software Segment        {% endcomment -%}{%- comment %}SFT|Orion|2.4.3.52854|Rhapsody|2.4.3|Testactivity|20070725111624{% endcomment -%}
 {%- comment %} Event Type              {% endcomment -%}{%- include 'Segments/EVN' recordedTime: fhirData.timestamp %}
 {%- comment %} Patient Identification  {% endcomment -%}{%- include 'Segments/PID' patient: patient, patientMR: patient.identifier[0], patientMRalt: patientMRalt, patientOrganizations: patientOrganizations, patientRelatedPersons: patientRelatedPersons %}
