@@ -1,6 +1,5 @@
 {% comment %} {{ '' | debug }} {% endcomment %}
 {%- assign messageHeaderObject = fhirData.entry | select: 'resource.resourceType', 'MessageHeader' | get_index: 0 -%}
-{% comment %} Since this is the ADT_A08 liquid template, the following 3 can be hardcoded {% endcomment %}
 {%- assign messageCodeMSH = 'ADT' -%}
 {%- assign triggerEventMSH = 'A08' -%}
 {%- assign messageStructureMSH = 'ADT_A08' -%}
